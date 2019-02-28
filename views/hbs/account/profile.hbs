@@ -19,11 +19,21 @@
         <label class="col-md-3 col-form-label font-weight-bold text-right">Gender</label>
         <div class="col-sm-6">
             <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="gender" value="male" data-toggle="radio" checked/>
+                {{#if meta.male}}
+                    <input class="form-check-input" type="radio" name="gender" value="male" data-toggle="radio" checked/>
+                {{/if}}
+                {{#unless meta.male}}
+                    <input class="form-check-input" type="radio" name="gender" value="male" data-toggle="radio" />
+                {{/unless}}
                 <label class="form-check-label">Male</label>
             </div>
             <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="gender" value="female" data-toggle="radio"/>
+                {{#if meta.female}}
+                    <input class="form-check-input" type="radio" name="gender" value="female" data-toggle="radio" checked/>
+                {{/if}}
+                {{#unless meta.female}}
+                    <input class="form-check-input" type="radio" name="gender" value="female" data-toggle="radio" />
+                {{/unless}}
                 <label class="form-check-label">Female</label>
             </div>
         </div>
@@ -36,7 +46,13 @@
     </div>
     <div class="form-group row">
         <label class="col-md-3 col-form-label font-weight-bold text-right">Gravatar</label>
-        <div class="col-sm-4"><img  src="{{user.gravatar}}" class="profile" width="100" height="100"/></div>
+        <div class="col-sm-4"><img  src="{{meta.avatar}}" class="profile" width="100" height="100"/></div>
+    </div>
+    <div class="form-group row">
+        <label class="col-md-3 col-form-label font-weight-bold text-right" for="picture">Or Type URL</label>
+        <div class="col-md-7">
+            <input class="form-control" type="text" name="picture" id="picture" autocomplete="autocomplete" value="{{user.profile.picture}}"/>
+        </div>
     </div>
     <div class="form-group">
         <div class="offset-sm-3 col-md-7 pl-2">
@@ -48,7 +64,7 @@
     <h3>Change Password</h3>
 </div>
 <form action="/account/password" method="POST">
-  <input type="hidden" name="_csrf"/>
+  <input type="hidden" name="_csrf" value="{{_csrf}}"/>
   <div class="form-group row">
     <label class="col-md-3 col-form-label font-weight-bold text-right" for="password">New Password</label>
     <div class="col-md-7">
@@ -73,7 +89,7 @@
 <form action="/account/delete" method="POST" onsubmit="return confirm('Are you sure you want to delete your account?');">
     <div class="form-group">
         <p class="offset-sm-3 col-md-7 pl-2">You can delete your account, but keep in mind this action is irreversible.</p>
-        <input type="hidden" name="_csrf"/>
+        <input type="hidden" name="_csrf" value="{{_csrf}}"/>
         <div class="offset-sm-3 col-md-7 pl-2">
             <button class="btn btn-danger" type="submit"><i class="fas fa-trash-alt fa-sm"></i>Delete my account</button>
         </div>

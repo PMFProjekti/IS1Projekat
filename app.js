@@ -3,6 +3,7 @@
  */
 const express = require('express');
 const exphbs = require('express-handlebars');
+const expressVue = require("express-vue");
 const compression = require('compression');
 const session = require('express-session');
 const bodyParser = require('body-parser');
@@ -33,6 +34,8 @@ dotenv.load({ path: '.env.example' });
  */
 const homeController = require('./controllers/home');
 const userController = require('./controllers/user');
+const groupController = require('./controllers/group');
+const subjectController = require('./controllers/subject');
 const contactController = require('./controllers/contact');
 
 /**
@@ -62,10 +65,11 @@ mongoose.connection.on('error', (err) => {
  * Express configuration.
  */
 app.set('host', process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0');
-app.set('port', process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080);
-app.set('views', path.join(__dirname, 'views'));
-const view = 'hbs';
+app.set('port', process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 3000);
+
+const view = 'none';
 if(view === 'hbs') {
+    app.set('views', path.join(__dirname, 'views/hbs'));
     app.engine('.hbs', exphbs(
         {
             defaultLayout: 'main',
@@ -76,7 +80,10 @@ if(view === 'hbs') {
     app.set('partialsDir', path.join(__dirname, 'views/partials/'));
     app.set('view engine', '.hbs');
 }
-else app.set('view engine', 'pug');
+else if(view === 'pug') {
+    app.set('views', path.join(__dirname, 'views/pug'));
+    app.set('view engine', 'pug');
+}
 app.use(expressStatusMonitor());
 app.use(compression());
 app.use(sass({
@@ -101,11 +108,14 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
 app.use((req, res, next) => {
-    if (req.path === '/api/upload') {
-        next();
-    } else {
-        lusca.csrf()(req, res, next);
-    }
+    next();
+});
+app.all('/*', function(req, res, next) {
+    res.setHeader('Content-Type', 'application/json');
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.header("Access-Control-Allow-Methods", "POST, PUT, GET, OPTIONS");
+    next();
 });
 app.use(lusca.xframe('SAMEORIGIN'));
 app.use(lusca.xssProtection(true));
@@ -137,23 +147,34 @@ app.use('/webfonts', express.static(path.join(__dirname, 'node_modules/@fortawes
 /**
  * Primary app routes.
  */
-app.get('/', homeController.index);
-app.get('/login', userController.getLogin);
-app.post('/login', userController.postLogin);
-app.get('/logout', userController.logout);
-app.get('/forgot', userController.getForgot);
-app.post('/forgot', userController.postForgot);
-app.get('/reset/:token', userController.getReset);
-app.post('/reset/:token', userController.postReset);
-app.get('/signup', userController.getSignup);
-app.post('/signup', userController.postSignup);
-app.get('/contact', contactController.getContact);
-app.post('/contact', contactController.postContact);
+//app.get('/', homeController.index);
+
+//app.get('/logout', userController.logout);
+//app.get('/forgot', userController.getForgot);
+//app.post('/forgot', userController.postForgot);
+//app.get('/reset/:token', userController.getReset);
+//app.post('/reset/:token', userController.postReset);
+//app.get('/contact', contactController.getContact);
+//app.post('/contact', contactController.postContact);
+app.post('/account/login', userController.postLogin);
+app.post('/account/signup', userController.postSignup);
 app.get('/account', passportConfig.isAuthenticated, userController.getAccount);
-app.post('/account/profile', passportConfig.isAuthenticated, userController.postUpdateProfile);
-app.post('/account/password', passportConfig.isAuthenticated, userController.postUpdatePassword);
-app.post('/account/delete', passportConfig.isAuthenticated, userController.postDeleteAccount);
-app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userController.getOauthUnlink);
+app.post('/account/update', userController.postUpdateProfile);
+app.get('/account/find', userController.getAccount);
+app.post('/account/role', userController.postUpdateRole);
+app.get('/account/all', userController.getAll);
+//app.post('/account/password', passportConfig.isAuthenticated, userController.postUpdatePassword);
+//app.post('/account/delete', passportConfig.isAuthenticated, userController.postDeleteAccount);
+//app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userController.getOauthUnlink);
+
+app.get('/group/all', groupController.getAll);
+app.get('/group/find', groupController.getFind);
+app.post('/group/create', groupController.postCreate);
+app.put('/group/add', groupController.putAddStudent);
+app.put('/group/remove', groupController.putRemoveStudent);
+
+app.get('/subject/all', subjectController.getAll);
+app.post('/subject/create', subjectController.postCreate);
 
 /**
  * Error Handler.

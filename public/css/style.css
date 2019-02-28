@@ -1,0 +1,51 @@
+.navbar {
+    background-color:#fcdeb6;
+}
+.hbox {
+    display: flex;
+    flex-direction: row;
+}
+.vbox {
+    display: flex;
+    flex-direction: column;
+}
+.text-center {
+    text-align: center;
+}
+.account-block {
+    display: flex;
+    background-color:#dddddd;
+    width: 300px;
+    height: 80px;
+    margin: 6px;
+}
+.account-block .avatar {
+    width: 80px;
+    height: 80px;
+}
+.account-block .name {
+    width: 100%;
+    font-size: 15px;
+}
+.account-block .email {
+    width: 100%;
+    font-size: 11px;
+}
+.account-block .role {
+    width: 100%;
+    font-size: 10px;
+}
+.role-select {
+    margin-top: 4px;
+    height: 25px;
+    margin-left: 10px;
+    margin-right: 10px;
+    width: 75%;
+}
+.role-select-btn {
+    margin-top: 4px;
+    height: 25px;
+    margin-right: 10px;
+    font-size: 12px;
+    padding-top: 3px;
+}

@@ -7,15 +7,7 @@ const userSchema = new mongoose.Schema({
   password: String,
   passwordResetToken: String,
   passwordResetExpires: Date,
-
-  snapchat: String,
-  facebook: String,
-  twitter: String,
-  google: String,
-  github: String,
-  instagram: String,
-  linkedin: String,
-  steam: String,
+  role: String,
   tokens: Array,
 
   profile: {
@@ -55,16 +47,23 @@ userSchema.methods.comparePassword = function comparePassword(candidatePassword,
 /**
  * Helper method for getting user's gravatar.
  */
-userSchema.methods.gravatar = function gravatar(size) {
+let getGravatar = function gravatar(size, email) {
   if (!size) {
     size = 200;
   }
-  if (!this.email) {
+  if (!email) {
     return `https://gravatar.com/avatar/?s=${size}&d=retro`;
   }
-  const md5 = crypto.createHash('md5').update(this.email).digest('hex');
+  const md5 = crypto.createHash('md5').update(email).digest('hex');
   return `https://gravatar.com/avatar/${md5}?s=${size}&d=retro`;
 };
+
+userSchema.methods.avatar = function avatar(size) {
+  if(this.profile.picture) {
+    return this.profile.picture;
+  }
+  else return getGravatar(size, this.email);
+}
 
 const User = mongoose.model('User', userSchema);
 

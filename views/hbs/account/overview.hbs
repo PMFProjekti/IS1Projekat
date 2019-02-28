@@ -1,0 +1,47 @@
+<div class="pb-2 mt-2 mb-4 border-bottom">
+  <h3>Postojeći Korisnici</h3>
+</div>
+<div class="row">
+    {{#each users}}
+      <form id="role-select-form" method="POST" action="/account/role">
+        <input type="hidden" name="_csrf" value="{{this.token}}"/>
+        <input type="hidden" name="email" value="{{this.email}}"/>
+        <div class="account-block hbox">
+          <img class="avatar" src="{{this.avatar}}" />
+          <div class="vbox" style="width: 100%; padding-top: 4px;">
+            <span class="name text-center"><b>{{this.name}}</b></span>
+            <span class="email text-center">{{this.email}}</span>
+            <div class="hbox">
+              <select class="role-select" name="role" form="role-select-form">
+                {{#if this.unknown}}
+                  <option value="unknown" selected>Nedefinisan</option>
+                {{/if}}
+                {{#unless this.unknown}}
+                  <option value="unknown">Nedefinisan</option>
+                {{/unless}}
+                {{#if this.student}}
+                  <option value="student" selected>Učenik</option>
+                {{/if}}
+                {{#unless this.student}}
+                  <option value="student">Učenik</option>
+                {{/unless}}
+                {{#if this.professor}}
+                  <option value="professor" selected>Profesor</option>
+                {{/if}}
+                {{#unless this.professor}}
+                  <option value="professor">Profesor</option>
+                {{/unless}}
+                {{#if this.headmaster}}
+                  <option value="headmaster" selected>Direktor</option>
+                {{/if}}
+                {{#unless this.headmaster}}
+                  <option value="headmaster">Direktor</option>
+                {{/unless}}
+              </select>
+              <button class="btn btn-success role-select-btn" type="submit">Save</button>
+            </div>
+          </div>
+        </div>
+      </form>
+    {{/each}}
+</div>
