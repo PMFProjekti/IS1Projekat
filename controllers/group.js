@@ -66,7 +66,6 @@ exports.postCreate = (req, res, next) => {
 
 // GET /group/find
 exports.getFind = (req, res) => {
-    console.log(req.query);
     if(!req.query.id) {
         return res.status(422).json('Invalid group id');
     }

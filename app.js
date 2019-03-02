@@ -36,6 +36,8 @@ const homeController = require('./controllers/home');
 const userController = require('./controllers/user');
 const groupController = require('./controllers/group');
 const subjectController = require('./controllers/subject');
+const lectureController = require('./controllers/lecture');
+const gradesController = require('./controllers/grades');
 const contactController = require('./controllers/contact');
 
 /**
@@ -175,6 +177,12 @@ app.put('/group/remove', groupController.putRemoveStudent);
 
 app.get('/subject/all', subjectController.getAll);
 app.post('/subject/create', subjectController.postCreate);
+
+app.get('/lecture/all', lectureController.getAll);
+app.post('/lecture/connect', lectureController.postConnect);
+
+app.get('/grades/all', gradesController.getAll);
+app.post('/grades/update', gradesController.postUpdate);
 
 /**
  * Error Handler.

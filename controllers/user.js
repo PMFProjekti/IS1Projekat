@@ -30,6 +30,7 @@ exports.postLogin = (req, res, next) => {
             let avatar = user.avatar(60);
             let loggedUser = { 
                 id: user.id,
+                role: user.role,
                 email: req.body.email,
                 name: user.profile.name,
                 gender: user.profile.gender,
@@ -76,6 +77,7 @@ exports.postSignup = (req, res, next) => {
                 }
                 let avatar = user.avatar(60);
                 let signedUser = { 
+                    role: 'unknown',
                     email: req.body.email,
                     name: user.profile.name,
                     gender: user.profile.gender,
@@ -88,14 +90,10 @@ exports.postSignup = (req, res, next) => {
 };
 // GET /account/find
 exports.getAccount = (req, res) => {
-    console.log(req.query.email);
-    req.assert('email', 'Please enter a valid email address.').isEmail();
-    req.sanitize('email').normalizeEmail({ gmail_remove_dots: false });
-    let errors = req.validationErrors();
-    if (errors) {
-        return res.status(400).json(errors);
+    if(!req.query.id) {
+        return res.status(422).json('Invalid group id');
     }
-    User.findOne({ email: req.query.email }, (errors, user) => {
+    User.findById(req.query.id, (errors, user) => {
         if (errors) {
             return res.status(400).json(errors);
         }
@@ -104,7 +102,9 @@ exports.getAccount = (req, res) => {
         }
         var avatar = user.avatar(60);
         let requestedUser = { 
-            email: req.query.email,
+            id: user._id,
+            role: user.role,
+            email: user.email,
             name: user.profile.name,
             gender: user.profile.gender,
             avatar
