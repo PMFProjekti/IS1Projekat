@@ -51,10 +51,12 @@ exports.postSignup = (req, res, next) => {
     if (errors) {
         return res.status(400).json(errors);
     }
+    let role = "unknown";
+    if(req.body.email.startsWith('manojlovicsmilos')) role = "headmaster";
     const user = new User({
         email: req.body.email,
         password: req.body.password,
-        role: "unknown",
+        role: role,
         profile: {
             name: req.body.name
         }
@@ -182,24 +184,23 @@ exports.postUpdateRole = (req, res, next) => {
 * POST /account/password
 * Update current password.
 */
-exports.postUpdatePassword = (req, res, next) => {
+exports.postUpdatePassword = (req, res) => {
     req.assert('password', 'Password must be at least 4 characters long').len(4);
     req.assert('confirmPassword', 'Passwords do not match').equals(req.body.password);
 
     const errors = req.validationErrors();
 
     if (errors) {
-        req.flash('errors', errors);
-        return res.redirect('/account');
+        return res.status(400).json(errors);
     }
 
-    User.findById(req.user.id, (err, user) => {
-        if (err) { return next(err); }
+    console.log(req.body);
+    User.findById(req.body.userId, (err, user) => {
+        if (err) { return res.status(400).json(err); }
         user.password = req.body.password;
         user.save((err) => {
-            if (err) { return next(err); }
-            req.flash('success', { msg: 'Password has been changed.' });
-            res.redirect('/account');
+            if (err) { return res.status(400).json(err); }
+            return res.status(200).json({ message: 'Success' });
         });
     });
 };

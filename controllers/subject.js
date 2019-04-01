@@ -85,3 +85,46 @@ exports.getAll = (req, res) => {
     .then(subjects => res.status(201).json(subjects))
     .catch(error => res.status(400).json(error))
 };
+
+// GET /subject/find
+exports.getFind = (req, res) => {
+    Subject.findById(req.query.id, async function (error, subject) {
+        if(error) {
+            return res.status(400).json(error);
+        }
+        return res.status(201).json(subject);
+    });
+};
+
+// POST /subject/update
+exports.postUpdate = (req, res, next) => {
+    console.log(req.body);
+    Subject.findById(req.body._id, (error, subject) => {
+        if(error) {
+            return res.status(400).json(error);
+        }
+        subject.name = req.body.name;
+        subject.year = req.body.year;
+        subject.save((errors) => {
+            if (errors) { 
+                return res.status(400).json(errors);
+            }
+            return res.status(201).json( { message: 'Success' } );
+        });
+    });
+};
+
+// DELETE /subject/delete
+exports.deleteSubject = (req, res) => {
+    console.log(req.query.id);
+    Subject.findById(req.query.id, (errors, subject) => {
+        if(errors) {
+            return res.status(400).json(errors);
+        }
+        if(!subject) {
+            return res.status(404).json('Not Found');
+        }
+        subject.remove();
+        return res.status(200).json({message:'Success'});
+    });
+}

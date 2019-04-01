@@ -164,17 +164,22 @@ app.post('/account/update', userController.postUpdateProfile);
 app.get('/account/find', userController.getAccount);
 app.post('/account/role', userController.postUpdateRole);
 app.get('/account/all', userController.getAll);
-//app.post('/account/password', passportConfig.isAuthenticated, userController.postUpdatePassword);
+app.post('/account/password', userController.postUpdatePassword);
 //app.post('/account/delete', passportConfig.isAuthenticated, userController.postDeleteAccount);
 //app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userController.getOauthUnlink);
 
 app.get('/group/all', groupController.getAll);
 app.get('/group/find', groupController.getFind);
+app.get('/group/mentor', groupController.getMentor);
 app.post('/group/create', groupController.postCreate);
 app.put('/group/add', groupController.putAddStudent);
 app.put('/group/remove', groupController.putRemoveStudent);
+app.get('/group/delete', groupController.deleteGroup);
 
 app.get('/subject/all', subjectController.getAll);
+app.get('/subject/find', subjectController.getFind);
+app.get('/subject/delete', subjectController.deleteSubject);
+app.post('/subject/update', subjectController.postUpdate);
 app.post('/subject/create', subjectController.postCreate);
 
 app.get('/lecture/all', lectureController.getAll);

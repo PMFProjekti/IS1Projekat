@@ -39,7 +39,7 @@ function getGroupData(mentorId, studentIds) {
     return Promise.all([getMentor(mentorId), getGroupUserData(studentIds)]);
 }
 
-exports.getStudentGroup = (studentId) => {
+let getStudentGroup = (studentId) => {
     return new Promise((resolve, reject) => {
         Group.find({}, function (errors, groups) {
             if(errors) {
@@ -54,6 +54,8 @@ exports.getStudentGroup = (studentId) => {
         });
     });
 };
+
+exports.getStudentGroup = getStudentGroup;
 
 // POST /group/create
 exports.postCreate = (req, res, next) => {
@@ -100,6 +102,42 @@ exports.getFind = (req, res) => {
         return res.status(200).json(foundGroup);
     });
 };
+
+// GET /group/mentor
+exports.getMentor = (req, res) => {
+    if(req.query.id) {
+        Group.findById(req.query.id, (errors, group) => {
+            if(errors) {
+                return res.status(400).json(errors);
+            }
+            if(!group) {
+                return res.status(404).json('Not Found');
+            }
+            return res.status(200).json({mentor:group.mentor});
+        });
+    }
+    else if(req.query.studentId) {
+        getStudentGroup(req.query.studentId)
+        .then(group => res.status(200).json({mentor:group.mentor}))
+        .catch(error => res.status(400).json(error));
+    }
+    else return res.status(422).json('Invalid group id');
+};
+
+// DELETE /group/delete
+exports.deleteGroup = (req, res) => {
+    console.log(req.query.id);
+    Group.findById(req.query.id, (errors, group) => {
+        if(errors) {
+            return res.status(400).json(errors);
+        }
+        if(!group) {
+            return res.status(404).json('Not Found');
+        }
+        group.remove();
+        return res.status(200).json({message:'Success'});
+    });
+}
 
 // GET /group/all
 exports.getAll = (req, res) => {
