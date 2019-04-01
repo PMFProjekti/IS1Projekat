@@ -1,4 +1,5 @@
 const Lecture = require('../models/Lecture');
+const GroupController = require('./group');
 
 // POST /lecture/connect
 exports.postConnect = (req, res, next) => {
@@ -34,6 +35,35 @@ exports.postConnect = (req, res, next) => {
     });
 };
 
+// GET /lecture/access
+exports.getGradeAllowed = (req, res) => {
+    if(!req.query.studentId) {
+        return res.status(422).json( { message: 'Invalid Student' } );
+    }
+    if(!req.query.subjectId) {
+        return res.status(422).json( { message: 'Invalid Subject' } );
+    }
+    if(!req.query.professorId) {
+        return res.status(422).json( { message: 'Invalid Professor' } );
+    }
+    return GroupController.getStudentGroup(req.query.studentId)
+    .then(group => {
+        Lecture.findOne( { groupId: group.id, subjectId: req.query.subjectId }, function (errors, lecture) {
+            if(errors) {
+                return res.status(400).json(errors);
+            }
+            if(!lecture) {
+                return res.status(200).json({ allowed: false });
+            }
+            if(lecture.professorId == req.query.professorId) {
+                return res.status(200).json({ allowed: true });
+            }
+            return res.status(200).json({ allowed: false });
+        });
+    })
+    .catch(error => res.status(400).json(error));
+};
+
 // GET /lecture/all
 exports.getAll = (req, res) => {
     Lecture.find({}, async function (err, lectures) {
@@ -45,12 +75,9 @@ exports.getAll = (req, res) => {
                 professorId: lecture.professorId
             }
         });
-        console.log(req.query.professorId);
-        console.log(allLectures);
         if(req.query.professorId) {
             allLectures = allLectures.filter(lecture => lecture.professorId == req.query.professorId);
         }
-        console.log(allLectures);
         if(req.query.groupId) {
             allLectures = allLectures.filter(lecture => lecture.groupId == req.query.groupId);
         }

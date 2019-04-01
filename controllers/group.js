@@ -39,9 +39,24 @@ function getGroupData(mentorId, studentIds) {
     return Promise.all([getMentor(mentorId), getGroupUserData(studentIds)]);
 }
 
+exports.getStudentGroup = (studentId) => {
+    return new Promise((resolve, reject) => {
+        Group.find({}, function (errors, groups) {
+            if(errors) {
+                return reject(errors);
+            }
+            groups.forEach(group => {
+                if(group.students.indexOf(studentId) != -1) {
+                    return resolve(group);
+                }
+            });
+            return reject({ message: 'Group Not Found' });
+        });
+    });
+};
+
 // POST /group/create
 exports.postCreate = (req, res, next) => {
-    console.log(req.body);
     if (!req.body.mentor) {
         return res.status(422).json('Invalid Mentor.');
     }

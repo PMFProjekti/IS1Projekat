@@ -1,3 +1,5 @@
+const Group = require('../models/Group');
+const group = require('./group');
 const Subject = require('../models/Subject');
 
 // POST /subject/create
@@ -20,20 +22,66 @@ exports.postCreate = (req, res, next) => {
     });
 };
 
+let listSubjects = (year) => {
+    return new Promise((resolve, reject) => {
+        Subject.find({}, async function (error, subjects) {
+            if(error) {
+                return reject(error);
+            }
+            let allSubjects = subjects.map(subject => {
+                return {
+                    id: subject._id,
+                    name: subject.name,
+                    year: subject.year
+                }
+            });
+            if(year) {
+                allSubjects = allSubjects.filter(subject => subject.year == year);
+            }
+            return resolve(allSubjects);
+        });
+    });
+}
+
+let findSubjects = (params) => {
+    return new Promise((resolve, reject) => {
+        if(params.groupId) {
+            Group.findById(params.groupId, (errors, group) => {
+                if(errors) {
+                    return reject(errors);
+                }
+                if(!group) {
+                    return reject({message:'Group Not Found'});
+                }
+                return listSubjects(group.year)
+                .then(subjects => resolve(subjects))
+                .catch(error => reject(error));
+            });
+        }
+        else if(params.studentId) {
+            return group.getStudentGroup(params.studentId)
+            .then(group => {
+                return listSubjects(group.year)
+                .then(subjects => resolve(subjects))
+                .catch(error => reject(error));
+            })
+            .catch(error => reject(error));
+        }
+        else
+        {
+            return listSubjects(group.year)
+                .then(subjects => resolve(subjects))
+                .catch(error => reject(error));
+        }
+    });
+}
+
+exports.listSubjects = listSubjects;
+exports.findSubjects = findSubjects;
+
 // GET /subject/all
 exports.getAll = (req, res) => {
-    Subject.find({}, async function (err, subjects) {
-        let promises = [];
-        let allSubjects = subjects.map(subject => {
-            return {
-                id: subject._id,
-                name: subject.name,
-                year: subject.year
-            }
-        });
-        if(req.query.year) {
-            allSubjects = allSubjects.filter(subject => subject.year == req.query.year);
-        }
-        return res.status(200).json(allSubjects);
-    });
+    findSubjects(req.query)
+    .then(subjects => res.status(201).json(subjects))
+    .catch(error => res.status(400).json(error))
 };

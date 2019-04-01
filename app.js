@@ -38,7 +38,6 @@ const groupController = require('./controllers/group');
 const subjectController = require('./controllers/subject');
 const lectureController = require('./controllers/lecture');
 const gradesController = require('./controllers/grades');
-const contactController = require('./controllers/contact');
 
 /**
  * API keys and Passport configuration.
@@ -180,6 +179,7 @@ app.post('/subject/create', subjectController.postCreate);
 
 app.get('/lecture/all', lectureController.getAll);
 app.post('/lecture/connect', lectureController.postConnect);
+app.get('/lecture/access', lectureController.getGradeAllowed);
 
 app.get('/grades/all', gradesController.getAll);
 app.post('/grades/update', gradesController.postUpdate);

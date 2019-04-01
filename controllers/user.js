@@ -42,7 +42,6 @@ exports.postLogin = (req, res, next) => {
 };
 // POST /account/signup
 exports.postSignup = (req, res, next) => {
-    console.log(req.body);
     req.assert('name', "Invalid Name, has to be at least 4 characters long.").len(4);
     req.assert('email', 'Email is not valid').isEmail();
     req.assert('password', 'Password must be at least 8 characters long.').len(8);
@@ -114,7 +113,6 @@ exports.getAccount = (req, res) => {
 };
 // POST /account/update
 exports.postUpdateProfile = (req, res, next) => {
-    console.log(req.body);
     req.assert('email', 'Please enter a valid email address.').isEmail();
     req.sanitize('email').normalizeEmail({ gmail_remove_dots: false });
     let errors = req.validationErrors();
@@ -174,9 +172,7 @@ exports.postUpdateRole = (req, res, next) => {
 };
 
 exports.postUpdateRole = (req, res, next) => {
-    console.log(req.body);
     User.findOneAndUpdate({ email: req.body.email }, { role: req.body.role }, (err, user) => {
-        console.log(user);
         if (err) { return next(err); }
         res.redirect('/account/overview');
     });
